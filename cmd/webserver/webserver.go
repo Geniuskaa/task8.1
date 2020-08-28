@@ -36,12 +36,15 @@ func execute() (err error) {
 	}()
 
 	for {
-		conn, err := listener.Accept()
+		conn, err := listener.Accept() // для клиентов
 		if err != nil {
 			log.Println(err)
 			continue
 		}
-		handle(conn)
+		// conn.SetDeadline одновременно устанавливает дедлайны и на чтение, и на запись, но лучше выставлять отдельно
+		conn.SetReadDeadline(time.Now().Add(time.Second * 30))
+		conn.SetWriteDeadline(time.Now().Add(time.Minute * 5))
+		go handle(conn)
 	}
 }
 
